@@ -1,0 +1,20 @@
+{
+  "name": "sherwood-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "npm run build && node scripts/serve-static.mjs",
+    "test": "node --test",
+    "check": "node --check src/comparison.js && node --check src/cookviewer.js && node --check src/evidence.js && node --check src/fixtures.js && node --check src/requests.js && node --check src/server.js && node --check public/app.js && node --check public/live-details.js && node --check public/live-handoff.js && node --check public/live-metrics.js && node --check public/live.js && node --check public/map-layout.js && node --check public/property-map.js && node --check public/cors-probe.js && node --check public/cookviewer.js && node --check public/simulation.js && node --check scripts/build-static.mjs && node --check scripts/serve-static.mjs",
+    "build": "node scripts/build-static.mjs",
+    "check:static": "node scripts/check-static.mjs",
+    "test:browser": "node scripts/verify-static.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
