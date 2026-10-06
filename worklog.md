@@ -246,3 +246,9 @@ Concise delivery ledger, newest entries first. Append-only except factual correc
 - Implemented FEAT-022: click/tap/keyboard-only Details, compact full-width panel beneath table, one property expanded at a time, Escape/close focus restoration. Mobile prioritizes three table columns; remaining facts accessible in Details. Duplicate hero steps hidden on phones; input sizes and spacing adjusted.
 - PASS: 43/43 unit tests (three old hover-controller tests replaced by one explicit-disclosure test), syntax/static checks and full static browser suite. Added hover/focus non-opening, Enter opening, full-width and Escape tests, plus open/close and overflow checks at 320/375/390/768.
 - Browser regression initially failed at 320: nowrap inherited by column headings overflowed table. Inspected element widths, added wrapping, reran complete browser suite successfully. Reviewed 320px full-page screenshot; artifacts /tmp/sherwood-gallery-artifacts/details-*.png. No real-device or screen-reader certification claimed. No push/deployment performed.
+
+## 2026-10-06 — Approved-site push and outgoing-link CI
+
+- Pushed approved no-build/mobile/details changes first: 6185aae to origin/main. Added dependency-free link checker and separate Outgoing links CI job afterward, as requested. Deploy depends on static checks and links; remains manual.
+- PASS: three checker unit scenarios (discovery, success/404, retry/exhaustion); four actual outgoing destinations returned HTTP 200: CookViewer parcel layer, County terms, OSM copyright and OSM fix-map. No tile crawling. Full unit/static checks performed separately.
+- Pages settings browser returns signed-out 404; requested user sign-in. SSH push is available, but does not grant Pages REST/UI settings access. No site publication or remote Pages setting change claimed.

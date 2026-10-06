@@ -376,3 +376,8 @@ Audit this revision against active requirements and DEC-012–021, including gal
 - Removed hover/focus disclosure. Row Details buttons toggle one full-width panel beneath the table; native summary closes it, Escape dismisses, aria-expanded/controls and focus return retained. Facts use a compact responsive grid rather than a narrow vertical popout.
 - Mobile table keeps property/value/delta; building size, age and source period remain in Details. Hide duplicate hero step list on phones, reduce spacing/map height and use 16px form inputs.
 - Verified 320/375/390/768 widths and desktop with browser checks; no page/panel horizontal overflow. Real-device touch/screen-reader audit not performed.
+
+## TASK-007 — Outgoing link CI and Pages configuration
+
+- User authorized pushing approved changes, then outgoing-link CI and Pages setup. Link checker and separate CI job implemented; Pages deployment requires both static and link checks. Tests cover discovery, redirects/status, retries and terminal failures.
+- Four current visitor link destinations returned HTTP 200 locally. Repository Pages settings still require authenticated browser access; plugin lacks Pages-settings capability. No publication claimed.

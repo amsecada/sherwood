@@ -11,7 +11,8 @@
     "test": "node --test",
     "check": "node --check src/comparison.js && node --check src/cookviewer.js && node --check src/evidence.js && node --check src/fixtures.js && node --check src/requests.js && node --check src/server.js && node --check public/live-details.js && node --check public/live-handoff.js && node --check public/live-metrics.js && node --check public/live.js && node --check public/map-layout.js && node --check public/property-map.js && node --check public/cookviewer.js && node --check public/simulation.js && node --check scripts/serve-static.mjs",
     "check:static": "node scripts/check-static.mjs",
-    "test:browser": "node scripts/verify-static.mjs"
+    "test:browser": "node scripts/verify-static.mjs",
+    "check:links": "node scripts/check-links.mjs"
   },
   "devDependencies": {
     "playwright": "1.63.0"
