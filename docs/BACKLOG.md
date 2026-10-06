@@ -364,3 +364,15 @@ Audit this revision against active requirements and DEC-012–021, including gal
 - Authorized by user: browser-only conversion, initialize sherwood, sync SSH remote and push. Local implementation complete; remote CI and public deployment tracked separately. Requirements FR-018/019, NFR-004/006; static hosting supersedes Render preparation for this gallery.
 - Direct browser lookup, page-memory simulated request with Withdraw/Delete, relative project paths, allowlisted artifact, locked development browser tests and manual Pages deployment after required checks implemented. No operator, storage or real messages.
 - Validation: 45 local unit tests plus syntax/build/artifact checks passed; static browser workflow verified. Public-host smoke/source-use review and Pages settings remain release checks. FEAT-010 remains blocked.
+
+## FEAT-021 — Ready-to-host static files and friendly README
+
+- User-authorized follow-up to FEAT-020, FR-018 and NFR-006. Implemented: public/ serves directly without npm/build/backend; Pages tests and publishes that same directory. Existing live source and simulated Withdraw/Delete retained.
+- README rewritten around purpose, four-step usage, example address, real-data/fictional-handoff distinction and simple hosting. Technical test commands moved into docs/DEVELOPMENT.md. No broader visual redesign or deployment included.
+
+## FEAT-022 — Explicit compact details and mobile comparison
+
+- User-authorized, implemented locally. FR-007/019, NFR-006; narrow presentation follow-up, not FEAT-010 redesign.
+- Removed hover/focus disclosure. Row Details buttons toggle one full-width panel beneath the table; native summary closes it, Escape dismisses, aria-expanded/controls and focus return retained. Facts use a compact responsive grid rather than a narrow vertical popout.
+- Mobile table keeps property/value/delta; building size, age and source period remain in Details. Hide duplicate hero step list on phones, reduce spacing/map height and use 16px form inputs.
+- Verified 320/375/390/768 widths and desktop with browser checks; no page/panel horizontal overflow. Real-device touch/screen-reader audit not performed.

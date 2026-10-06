@@ -59,6 +59,12 @@ try{
  mode='normal';await page.locator('#lookup-submit').click();await page.locator('#analysis-content').waitFor({state:'visible'});
  if(true){
   await page.locator('.property-map').scrollIntoViewIfNeeded();await page.locator('.map-marker').first().waitFor();
+  const detailButton=page.getByRole('button',{name:'Details for 200 TEST ST',exact:true});
+  await detailButton.hover();assert.equal(await page.locator('.candidate-details[open]').count(),0);
+  await detailButton.focus();assert.equal(await page.locator('.candidate-details[open]').count(),0);
+  await detailButton.press('Enter');assert.equal(await page.locator('.candidate-details[open]').count(),1);
+  assert.ok(await page.locator('.candidate-details[open]').evaluate(e=>e.clientWidth >= document.querySelector('#candidate-content').clientWidth-2));
+  await page.keyboard.press('Escape');assert.equal(await page.locator('.candidate-details[open]').count(),0);
   const before=calls;await page.locator('.map-marker[data-pin="01011000430000"]').hover();
   assert.ok(await page.locator('tr[data-pin="01011000430000"]').evaluate(e=>e.classList.contains('map-selected')));
   await page.locator('.map-marker[data-pin="01011000430000"]').click();await page.keyboard.press('Escape');
@@ -76,6 +82,17 @@ try{
   assert.ok(await page.locator('tr[data-pin="01011000430000"]').evaluate(e=>e.classList.contains('map-selected')));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
   await page.screenshot({path:'/tmp/sherwood-gallery-artifacts/mobile.png',fullPage:true});
+  for(const width of [320,375,390,768]){
+   await page.setViewportSize({width,height:844});
+   await detailButton.click();await page.locator('.candidate-details[open]').waitFor();
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>e.scrollWidth>e.clientWidth && e.clientWidth>0).map(e=>({tag:e.tagName,cls:e.className,width:e.getBoundingClientRect().width,sw:e.scrollWidth,cw:e.clientWidth,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)})))));
+   const panel=page.locator('.candidate-details[open] .candidate-detail-panel');
+   assert.ok(await panel.evaluate(e=>e.scrollWidth<=e.clientWidth),`detail overflow at ${width}`);
+   await page.screenshot({path:`/tmp/sherwood-gallery-artifacts/details-${width}.png`,fullPage:true});
+   await page.locator('.candidate-details[open] summary').click();
+   assert.equal(await page.locator('.candidate-details[open]').count(),0);
+  }
+
  }
  if(true){
   const edge=await context.newPage();edge.setDefaultTimeout(5000);await edge.goto(base);

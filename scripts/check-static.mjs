@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import {readdir,readFile} from 'node:fs/promises';
-const files=await readdir('dist');assert.ok(files.includes('index.html'));
+const files=await readdir('public');assert.ok(files.includes('index.html'));
 assert.ok(!files.some(f=>/operator|server|fixtures|token|\.env/.test(f)));
 for(const file of files){
- const text=await readFile(`dist/${file}`,'utf8');
+ const text=await readFile(`public/${file}`,'utf8');
  assert.doesNotMatch(text,/['"]\/api\//,`${file}: server API dependency`);
  assert.doesNotMatch(text,/\b(?:localStorage|sessionStorage|indexedDB)\b/,`${file}: persistent browser storage`);
  for(const match of text.matchAll(/(?:from\s+|(?:src|href)=)["']\.\/([^"']+)["']/g)) assert.ok(files.includes(match[1]),`${file}: missing ${match[1]}`);

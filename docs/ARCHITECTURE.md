@@ -142,3 +142,11 @@ FEAT-019 supersedes gallery operator routes, assets and token setup. Private vis
 The user authorized static conversion and repository setup. Browser-compatible CookViewer reader now resides in public/cookviewer.js, with direct credential-free fetch and caller cancellation combined with timeout. Limits apply per page. live.js computes analysis locally; simulation.js owns a single cloned fictional request in page memory. No persistence or operator. Historical Node modules remain only as prior implementation/reference and unit-test coverage outside the deployed artifact.
 
 Build emits an explicit allowlist to dist and uses relative paths. GitHub Actions checks syntax, units, artifact and static browser workflow at /sherwood/ before manual publication. Immutable official Action pins and locked Playwright development dependency are used. Actual remote settings/deployment must be verified separately.
+
+## No-build static delivery
+
+The user requested eliminating npm from site setup and hosting. public/ is now the single ready-to-serve site directory, with index.html and its CSP committed directly. Removed the generated-dist build step and retired unused public demo/probe assets. Pages uploads public/ after checks; static browser tests serve those same files. npm is optional development/CI tooling only, never a hosting prerequisite.
+
+## Explicit details and mobile layout
+
+FEAT-022 supersedes hover/focus detail preview. Candidate row buttons control full-width native details disclosures outside the table scroller; one is visible at a time. Native toggle synchronizes aria-expanded and returns focus on close. Escape dispatches dismissal. Mobile hides secondary main-table columns, retaining those values in the responsive detail grid. Map hover remains only for linked selection, not opening details.

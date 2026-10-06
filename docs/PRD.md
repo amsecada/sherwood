@@ -205,3 +205,5 @@ Before a live pilot: verify supported/failure journeys, data rights, expert exam
 DEC-025: user subsequently requests removal of the map playback button, superseding FEAT-016's presentation. Keep the checkbox/legend below the map and CSS reduced-motion support. Static-hosting feasibility was asked about; no hosting migration authorized.
 
 DEC-026: user authorizes a small direct-browser CookViewer probe and removal of the gallery operator portion while preserving visitor Withdraw/Delete. Local CORS probe succeeded. Gallery operator pages/routes/credentials are retired; production pilot requirements remain historical/future scope. No full static migration yet.
+
+DEC-027: static site hosting must require no npm or build step. public/ is directly deployable; optional development/CI tests may retain Node/npm. README should explain purpose and visitor usage first.

@@ -2,7 +2,7 @@ import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-export function staticServer({root=resolve('dist'),prefix='/'}={}) {
+export function staticServer({root=resolve('public'),prefix='/'}={}) {
  return http.createServer(async(req,res)=>{
   const path = new URL(req.url,'http://localhost').pathname;
   if (!['GET','HEAD'].includes(req.method) || !path.startsWith(prefix)) {res.writeHead(404);res.end();return;}

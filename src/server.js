@@ -8,7 +8,7 @@ import {createEvidence} from './evidence.js';
 import {summarizeCandidates} from '../public/live-metrics.js';
 import {providers} from './fixtures.js';
 const project=fileURLToPath(new URL('../',import.meta.url));
-const assets={'/':'live.html','/cors-probe':'cors-probe.html','/cors-probe.js':'cors-probe.js','/styles.css':'styles.css','/live':'live.html','/live.js':'live.js','/live-handoff.js':'live-handoff.js','/map-layout.js':'map-layout.js','/property-map.js':'property-map.js','/live-metrics.js':'live-metrics.js','/live-details.js':'live-details.js'};
+const assets={'/':'index.html','/styles.css':'styles.css','/live':'index.html','/live.js':'live.js','/live-handoff.js':'live-handoff.js','/map-layout.js':'map-layout.js','/property-map.js':'property-map.js','/live-metrics.js':'live-metrics.js','/live-details.js':'live-details.js'};
 async function body(req){let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>16384)fail(413,'Request is too large.');chunks.push(chunk);}try{const value=JSON.parse(Buffer.concat(chunks).toString()||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw new Error();return value;}catch{fail(400,'Send a JSON object.');}}
 export function createServer({cookViewer=createCookViewer(),now=Date.now,publicOrigin}={}){
  const configured=validatePublicOrigin(publicOrigin);

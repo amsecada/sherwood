@@ -234,3 +234,15 @@ Concise delivery ledger, newest entries first. Append-only except factual correc
 - Converted visitor runtime to direct CookViewer plus cloned page-memory simulation; preserves Withdraw/Delete, expiry and original parcel identity. Build allowlists 11 files with relative paths and CSP. Added reproducible Playwright dependency/lockfile, static artifact checks and official SHA-pinned GitHub Pages workflow. Main push/PR validates; deployment is manual and depends on checks.
 - Local validation: 45/45 unit tests, syntax, build and static artifact checks passed. Static browser workflow passed against /sherwood/ with source fixtures and intercepted tiles. Review corrected aborted-query propagation and misleading retention copy. Public source-use review/hosted smoke not claimed complete.
 - User supplied SSH remote git@github.com:amsecada/sherwood.git; remote refs query succeeded with no refs (empty repository). Configured origin accordingly. Local .local, .superpowers, dist and node_modules are ignored; source secret-pattern scan found no matches. Preparing initial commit and push; result to be reported separately.
+
+## 2026-10-06 — No-build static site and README
+
+- User requested npm-free site setup and a purpose-first README. Made public/ the directly deployable directory; committed-source index.html includes security metadata. Removed build-static script and unused public synthetic/probe files. Pages uploads public/ without a build; optional npm tooling remains exclusively for development/CI or preview convenience.
+- README now explains the app, four steps, example address/PIN, live data versus fictional handoff, page-memory behavior and non-npm static hosting. Added docs/DEVELOPMENT.md for technical checks/history.
+- PASS: 45/45 unit tests; syntax and static path/no-API/no-storage checks; full static browser regression against public/ at /sherwood/; README/development links. Local port 3100 restarted using Python's static file server, without npm. No remote publication performed in this turn.
+
+## 2026-10-06 — Compact explicit details and mobile pass
+
+- Implemented FEAT-022: click/tap/keyboard-only Details, compact full-width panel beneath table, one property expanded at a time, Escape/close focus restoration. Mobile prioritizes three table columns; remaining facts accessible in Details. Duplicate hero steps hidden on phones; input sizes and spacing adjusted.
+- PASS: 43/43 unit tests (three old hover-controller tests replaced by one explicit-disclosure test), syntax/static checks and full static browser suite. Added hover/focus non-opening, Enter opening, full-width and Escape tests, plus open/close and overflow checks at 320/375/390/768.
+- Browser regression initially failed at 320: nowrap inherited by column headings overflowed table. Inspected element widths, added wrapping, reran complete browser suite successfully. Reviewed 320px full-page screenshot; artifacts /tmp/sherwood-gallery-artifacts/details-*.png. No real-device or screen-reader certification claimed. No push/deployment performed.

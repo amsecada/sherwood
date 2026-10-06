@@ -77,7 +77,7 @@ function attributeCell(value, delta, unit) {
 }
 function candidateDetails(candidate, subject, result, metrics) {
   const details = node('details', undefined, 'candidate-details');
-  const summary = node('summary', 'Details');
+  const summary = node('summary', `Details · ${candidate.street_address || candidate.PIN14}`);
   summary.setAttribute('aria-label', `Details for ${candidate.street_address || candidate.PIN14}`);
   const panel = node('div', undefined, 'candidate-detail-panel');
   panel.append(node('p', 'Subject → candidate', 'eyebrow'));
@@ -87,6 +87,8 @@ function candidateDetails(candidate, subject, result, metrics) {
     item.append(node('dt', label), node('dd', `${display(subjectValue)} → ${display(candidateValue)}`));
     facts.append(item);
   };
+  add('Building size (sq ft)', rawNumber(subject.BLDGSQFT), rawNumber(candidate.BLDGSQFT));
+  add('Age (years)', rawNumber(subject.BLDGAGE), rawNumber(candidate.BLDGAGE));
   add('Land value component', rawNumber(subject.CURRENTVALUE_LAND), rawNumber(candidate.CURRENTVALUE_LAND));
   add('Building value component', rawNumber(subject.CURRENTVALUE_BLDG), rawNumber(candidate.CURRENTVALUE_BLDG));
   add('Lot size (sq ft)', rawNumber(subject.LANDSF), rawNumber(candidate.LANDSF));
@@ -101,7 +103,7 @@ function candidateDetails(candidate, subject, result, metrics) {
   if (metrics.lotDelta) panel.append(node('p', `Lot-size Δ: ${formatDelta(metrics.lotDelta).amount} sq ft.`, 'help'));
   panel.append(node('p', 'Total per building square foot divides the entire County value, including any land component, by building size. It is not a building-only valuation or a market-price estimate.', 'help'));
   panel.append(node('p', `Subject retrieved ${date(result.subjectRetrievedAt)}. Candidates retrieved ${date(result.retrievedAt)}. Matched source fields do not establish comparable suitability.`, 'help'));
-  panel.append(node('p', 'Click/tap Details to keep this open. Press Escape to dismiss.', 'help'));
+  panel.append(node('p', 'Click or tap the heading to close. Press Escape to dismiss.', 'help'));
   details.append(summary, panel);
   wireDetails(details, summary);
   return details;
@@ -190,6 +192,7 @@ async function fetchCandidates(id) {
       }
       head.append(tr); table.append(head);
       const rows = node('tbody'), rowsByPin = new Map();
+      const detailArea = node('div', undefined, 'comparison-details');
       const subjectRow = node('tr', undefined, 'subject-baseline');
       const subjectAddress = node('th', result.subject.street_address || 'Subject', 'candidate-address');
       subjectAddress.scope = 'row';
@@ -206,7 +209,23 @@ async function fetchCandidates(id) {
         const row = node('tr'); row.dataset.pin = p.PIN14; rowsByPin.set(p.PIN14, row);
         const address = node('th', display(p.street_address), 'candidate-address');
         address.scope = 'row';
-        address.append(node('small', `PIN ${display(p.PIN14)}`), candidateDetails(p, result.subject, result, metrics));
+        address.append(node('small', `PIN ${display(p.PIN14)}`));
+        const details = candidateDetails(p, result.subject, result, metrics);
+        details.id = `details-${p.PIN14}`; details.hidden = true;
+        const toggle = node('button', 'Details', 'detail-toggle secondary'); toggle.type = 'button';
+        toggle.setAttribute('aria-label', `Details for ${p.street_address || p.PIN14}`);
+        toggle.setAttribute('aria-controls', details.id); toggle.setAttribute('aria-expanded', 'false');
+        toggle.onclick = () => {
+          const opening = !details.open;
+          for (const other of detailArea.querySelectorAll('details')) {other.open = false; other.hidden = true;}
+          details.hidden = !opening; details.open = opening;
+          if (opening) { details.querySelector('summary').focus(); details.scrollIntoView({block: 'nearest'}); }
+        };
+        details.addEventListener('toggle', () => {
+          toggle.setAttribute('aria-expanded', String(details.open));
+          if (!details.open) { if (details.contains(document.activeElement)) toggle.focus(); details.hidden = true; }
+        });
+        detailArea.append(details); address.append(toggle);
         const value = node('td', rawNumber(p.CURRENTVALUE_TOTAL));
         value.append(node('small', display(p.current_value_desc)));
         const year = node('td', display(p.TAXYR));
@@ -215,7 +234,8 @@ async function fetchCandidates(id) {
         rows.append(row);
       }
       const mapContainer = node('div'); $('candidate-content').append(mapContainer);
-      table.append(rows); wrap.append(table); $('candidate-content').append(wrap);
+      table.className = 'comparison-table';
+      table.append(rows); wrap.append(table); $('candidate-content').append(wrap, detailArea);
       propertyMap = mountPropertyMap(mapContainer, {...result, rowsByPin});
       const filters = result.filters;
       $('candidate-content').append(node('p', `Exploratory filter: township ${filters.township}; neighborhood ${filters.neighborhood}; class ${filters.class}; year ${filters.year}; label ${filters.valueLabel}; stage ${filters.stage}; building size ${filters.buildingSizeMin}–${filters.buildingSizeMax} sq ft. The size range is a test setting, not an approved matching rule.`, 'help'));

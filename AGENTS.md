@@ -46,3 +46,5 @@ Observable acceptance criteria met; linked requirements covered; relevant tests/
 Latest gallery override (DEC-026): operator UI/API/token setup retired at user request; preserve visitor Withdraw/Delete. Direct-browser feasibility page approved and locally verified. Do not reintroduce operator behavior based on historical prototype instructions. Main workflow remains server-backed until static conversion is authorized/implemented.
 
 Current runtime override: the user authorized static conversion and GitHub repository setup/push. npm start builds and serves static dist; browser CookViewer and page-memory simulation replace application API calls. Historical Node code is excluded from deployment. Pages workflow checks every main push/PR and deploys only on manual dispatch after checks. Do not restore backend/operator behavior from older instructions.
+
+No-build override (DEC-027): public/ now contains the complete deployable site including index.html. Do not restore an npm build requirement. npm scripts are development checks or optional preview only; Pages publishes public/.
