@@ -8,9 +8,6 @@ export function mountPropertyMap(container, {subject, records, rowsByPin}) {
   const shell = node('section', undefined, 'property-map');
   shell.append(node('h3', 'The properties around your comparison.'));
   const legend = node('p', 'S = subject · numbered circles = candidates. Approximate County locations. Pulses connect the selected comparison; they do not measure valuation influence.', 'help');
-  const controls = node('div', undefined, 'actions map-controls');
-  const tileLabel = node('label', undefined, 'check-label'), tilesEnabled = node('input'); tilesEnabled.type = 'checkbox'; tilesEnabled.checked = true;
-  tileLabel.append(tilesEnabled, node('span', 'Show street background (OpenStreetMap)')); controls.append(tileLabel);
   const viewport = node('div', undefined, 'map-viewport'), tiles = node('div', undefined, 'map-tiles'), markers = node('div', undefined, 'map-markers');
   const connections = svgNode('svg'); connections.classList.add('map-connections'); connections.setAttribute('aria-hidden', 'true');
   const line = svgNode('line'); line.classList.add('radar-link'); const ring = svgNode('circle'); ring.classList.add('radar-ring'); ring.setAttribute('r', '28');
@@ -21,7 +18,7 @@ export function mountPropertyMap(container, {subject, records, rowsByPin}) {
   const credit = node('a', '© OpenStreetMap contributors'); credit.href = 'https://www.openstreetmap.org/copyright'; credit.target = '_blank'; credit.rel = 'noreferrer';
   const issue = node('a', 'Report a map issue'); issue.href = 'https://www.openstreetmap.org/fixthemap'; issue.target = '_blank'; issue.rel = 'noreferrer';
   attribution.append(credit, document.createTextNode(' · '), issue);
-  shell.append(viewport, attribution, controls, legend, details, locations, tileStatus, node('p', 'Street tiles are loaded only for the visible map. OpenStreetMap receives tile requests and network metadata, not your parcel ID, address text or simulated request. Street-map availability is best-effort.', 'help'));
+  shell.append(viewport, attribution, legend, details, locations, tileStatus, node('p', 'Street tiles are loaded only for the visible map. OpenStreetMap receives tile requests and network metadata, not your parcel ID, address text or simulated request. Street-map availability is best-effort.', 'help'));
   container.append(shell);
   function on(element, event, fn) { element.addEventListener(event, fn); cleanup.push(() => element.removeEventListener(event, fn)); }
   function select(pin) {
@@ -58,7 +55,7 @@ export function mountPropertyMap(container, {subject, records, rowsByPin}) {
   }
   function drawTiles() {
     const version = ++renderVersion; tiles.replaceChildren(); tileStatus.textContent = '';
-    if (!visible || !tilesEnabled.checked || !layout?.markers.length) return;
+    if (!visible || !layout?.markers.length) return;
     for (const tile of layout.tiles) {
       const image = document.createElement('img'); image.alt = ''; image.referrerPolicy = 'origin'; image.draggable = false;
       image.style.left = `${tile.left}px`; image.style.top = `${tile.top}px`;
@@ -84,7 +81,6 @@ export function mountPropertyMap(container, {subject, records, rowsByPin}) {
     }
     select(selected); drawTiles();
   }
-  tilesEnabled.onchange = drawTiles;
   const resize = new ResizeObserver(render); resize.observe(viewport);
   const intersection = new IntersectionObserver(entries => { if (destroyed) return; const next = entries[0].isIntersecting; if (next !== visible) { visible = next; drawTiles(); } }); intersection.observe(viewport);
   render();

@@ -1,6 +1,6 @@
 # Project Sherwood — Product Requirements
 
-Status: gallery FEAT-008/009 implemented locally 2026-10-06; FEAT-010 blocked; four-step V0 and Cook County/API focus approved 2026-10-05; localhost synthetic workflow and read-only live API lookup approved; live comparison/contact and launch gates remain open. This revision supersedes the broader blueprint from earlier the same day. Existing IDs remain permanent; deferred requirements are retained below.
+Status: gallery FEAT-008/009 implemented locally 2026-10-06; FEAT-010 authorized under DEC-028; four-step V0 and Cook County/API focus approved 2026-10-05; localhost synthetic workflow and read-only live API lookup approved; live comparison/contact and launch gates remain open. This revision supersedes the broader blueprint from earlier the same day. Existing IDs remain permanent; deferred requirements are retained below.
 
 ## Authorized local testing scope
 
@@ -86,7 +86,7 @@ Revised rows retain their original subject and ID. Deferred rows are not accepta
 | FR-017 | Active, new: reviewed templates explain only displayed comparison facts and limitations; comparison calculations and interpretation are deterministic and versioned; no AI or opportunity score | Template and replay cases; FEAT-003–004 |
 | FR-018 | Requested gallery-only: unified real CookViewer lookup, descriptive rough analysis and explicit simulated handoff to a fictional organization; transient state, no actual contact or filing | FEAT-008; DEC-019 |
 | FR-019 | Requested gallery-only: approximate source-backed property map before the candidate table, linked marker/row highlighting and accessible radar-style relationship effect; no invented influence model | FEAT-009; DEC-020 |
-| FR-020 | Requested gallery-only, blocked: coherent visual redesign after a separate user design discussion and approval | FEAT-010; DEC-021 |
+| FR-020 | Authorized gallery-only: forest-themed visual redesign with Kinetics-inspired motion, full user-delegated creative direction under DEC-028 | FEAT-010; DEC-021 |
 
 ## Quality requirements
 
@@ -207,3 +207,17 @@ DEC-025: user subsequently requests removal of the map playback button, supersed
 DEC-026: user authorizes a small direct-browser CookViewer probe and removal of the gallery operator portion while preserving visitor Withdraw/Delete. Local CORS probe succeeded. Gallery operator pages/routes/credentials are retired; production pilot requirements remain historical/future scope. No full static migration yet.
 
 DEC-027: static site hosting must require no npm or build step. public/ is directly deployable; optional development/CI tests may retain Node/npm. README should explain purpose and visitor usage first.
+
+## DEC-028 — Forest visual redesign and always-on streets
+
+2026-10-06: user explicitly requests aesthetic redesign across the site, supplies https://kinetics.colorion.co/#library as inspiration, specifies a green Sherwood forest theme, and grants full creative control. This supersedes DEC-021’s pending separate design-approval gate and authorizes FEAT-010. Direction: warm paper, evergreen/fern panels, serif editorial headings, gold accents, gentle spring-like entrances and button/disclosure feedback. Preserve readable evidence, mobile tables, keyboard focus, reduced motion and fictional handoff boundaries. Street background is always enabled for visible maps; remove its checkbox (supersedes FEAT-017). Tile failure still leaves positions/table available. No deployment or data-policy changes are included.
+
+## DEC-029 — Bounded match search with lower-value priority
+
+2026-10-06: user authorizes implementing the discussed async search and lower-value prioritization for local examination. FR-023: inspect more matching records, prioritize useful lower-valued candidates, disclose search scope and retain broader comparison context. FEAT-023 implements up to three sequential pages of 20 (60 returned records maximum), in value-independent PIN order, under the existing township/neighborhood/class/year/stage/label and ±20% size constraints. No geographical or comparability relaxation. Stop on source exhaustion or cap, never on achieving a desired lower-value count. Rank lower totals first, then closest absolute building size, lower total and PIN. Age/condition are not matching rules; differences remain visible.
+
+Default map/table shortlist is the first five ranked matches (may include equal/higher values); Show all exposes every locally accepted match. Display counts, batches, exclusions and source truncation. Median bands use the entire accepted examined pool regardless of selected view, superseding DEC-023's displayed-only population for this search. Arithmetic, minimum-three rule and thresholds unchanged; method/template `live-search-median-3`, search `bounded-pool-1`. Full pool and scope travel together into page-memory simulation. Source failure clears the new comparison; no partial pool becomes a complete result. Clear cancels remaining queries. No expert-comparable qualification, assessment conclusion, geographic expansion, persistence, backend or publication authorized. Existing TASK-001/002 and real-contact gates remain open.
+
+## DEC-030 — Dark forest, slate and glass
+
+User requests a much darker Sherwood aesthetic with grey/green/glass effects. This refines FEAT-010 / FR-020 and supersedes DEC-028's warm-paper palette: charcoal-green canvas, slate and green translucent panels, soft mist text, mint highlights, subtle borders/depth and decorative fern. Preserve responsive layout, keyboard/reduced-motion behavior, readable lower/higher value colors and the existing workflow. Glass blur is progressive enhancement with dark fallback surfaces. OSM imagery is visually darkened without changing its provider, positions or attribution.

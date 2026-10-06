@@ -7,7 +7,7 @@ Sherwood lets you look up a home, explore nearby comparison properties, and see 
 ## What you can do
 
 1. **Find your property.** Enter a Cook County street address or parcel identification number (PIN).
-2. **Explore the comparison.** See up to five comparison properties on a map and in a table. Hover over a marker or table row to see which property it represents. Select **Details** to open a compact comparison beneath the table; details never open on hover. On phones, the table keeps the key values visible and puts secondary facts in Details.
+2. **Explore the comparison.** Sherwood searches up to 60 records using consistent matching rules, then shows five matches with lower County values first. Choose **Show all matches** to inspect the full group. The summary always includes all accepted matches, including higher values. Hover over a marker or table row to see which property it represents. Select **Details** to open a compact comparison beneath the table; details never open on hover. On phones, the table keeps the key values visible and puts secondary facts in Details.
 3. **Understand the differences.** Compare recorded values, building sizes and ages, then read a short summary of the values shown.
 4. **Try the next step.** Create a simulated request to a fictional organization. Withdraw or delete it whenever you like.
 
@@ -15,7 +15,7 @@ Try **202 W STATION ST** or PIN **01011000250000**. Address lookup uses the Coun
 
 ## Real records, simulated handoff
 
-Property records come directly from [Cook County’s CookViewer API](https://gis.cookcountyil.gov/traditional/rest/services/CookViewer3Parcels/MapServer/0). The map uses OpenStreetMap. The comparison summary describes the displayed data; it is not a tax-savings estimate or a promise of an appeal outcome.
+Property records come directly from [Cook County’s CookViewer API](https://gis.cookcountyil.gov/traditional/rest/services/CookViewer3Parcels/MapServer/0). The map always shows an OpenStreetMap street background when tiles are available. The comparison summary describes the displayed data; it is not a tax-savings estimate or a promise of an appeal outcome.
 
 The organization and handoff are fictional. Nothing is sent or filed, and no account or contact information is required. Your comparison and simulated request stay in the current page’s memory. Refreshing or closing the page clears them. A simulated request also expires after one hour.
 

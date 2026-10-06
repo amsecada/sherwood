@@ -31,19 +31,20 @@ const integer = value => Number.isInteger(value) && value >= 0;
 export function createCookViewer({fetchImpl = fetch, now = Date.now} = {}) {
   let activeQueries = 0;
   const queryStarts = [];
-  async function query(where, limit, signal) {
+  async function query(where, limit, signal, offset = 0) {
     signal?.throwIfAborted();
     if (activeQueries >= 2) error(429, 'Two source queries are already running. Please wait and try again.');
     while (queryStarts.length && queryStarts[0] <= now() - 60000) queryStarts.shift();
     if (queryStarts.length >= 60) error(429, 'The page source limit is reached. Try again in a minute.');
     const url = new URL(endpoint);
-    url.search = new URLSearchParams({f: 'json', where, outFields: fields.join(','), returnGeometry: 'false', resultRecordCount: String(limit), orderByFields: 'PIN14'});
+    url.search = new URLSearchParams({f: 'json', where, outFields: fields.join(','), returnGeometry: 'false', resultRecordCount: String(limit), orderByFields: 'PIN14', resultOffset: String(offset)});
     activeQueries++;
     queryStarts.push(now());
     try {
       const response = await fetchImpl(url, {mode: 'cors', credentials: 'omit', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000), redirect: 'error', headers: {Accept: 'application/json'}});
       if (!response.ok) error(502, 'CookViewer returned an HTTP error. No source data is available for this query.');
       const data = await response.json();
+      signal?.throwIfAborted();
       if (data?.error) error(502, 'CookViewer rejected this query. No source conclusion can be drawn.');
       if (!data || !Array.isArray(data.features) || data.features.some(f => !f?.attributes || typeof f.attributes !== 'object' || Array.isArray(f.attributes))) error(502, 'CookViewer returned an unexpected response.');
       return {
@@ -73,7 +74,7 @@ export function createCookViewer({fetchImpl = fetch, now = Date.now} = {}) {
       const result = await query(where, 10, signal);
       return {...result, state: result.records.length ? 'matches' : 'not-found', limitation};
     },
-    async candidates(value, {signal} = {}) {
+    async candidates(value, {signal, onProgress} = {}) {
       const id = pin(value);
       const subjectResult = await query(`PIN14 = ${sqlString(id)}`, 2, signal);
       if (!subjectResult.records.length) return {...subjectResult, state: 'not-found', limitation};
@@ -82,19 +83,34 @@ export function createCookViewer({fetchImpl = fetch, now = Date.now} = {}) {
       const required = ['township_name', 'BCLASS', 'NBHD', 'TAXYR', 'BLDGSQFT', 'current_procname', 'current_value_desc'];
       const missing = required.filter(key => key === 'BLDGSQFT' ? !positive(subject[key]) : ['NBHD', 'TAXYR'].includes(key) ? !integer(subject[key]) : !subject[key]?.trim());
       if (subject.PIN14 !== id) missing.push('PIN14');
+      if (!positive(subject.CURRENTVALUE_TOTAL)) missing.push('CURRENTVALUE_TOTAL');
       if (missing.length) return {source: subjectResult.source, retrievedAt: subjectResult.retrievedAt, state: 'insufficient-fields', subject, records: [], missing, limitation};
       const low = Math.ceil(subject.BLDGSQFT * 0.8), high = Math.floor(subject.BLDGSQFT * 1.2);
       const where = [`PIN14 <> ${sqlString(id)}`, `township_name = ${sqlString(subject.township_name)}`, `NBHD = ${subject.NBHD}`, `BCLASS = ${sqlString(subject.BCLASS)}`, `TAXYR = ${subject.TAXYR}`, `current_procname = ${sqlString(subject.current_procname)}`, `current_value_desc = ${sqlString(subject.current_value_desc)}`, `BLDGSQFT BETWEEN ${low} AND ${high}`, 'CURRENTVALUE_TOTAL > 0'].join(' AND ');
-      const result = await query(where, 5, signal);
-      const seen = new Set([id]);
-      const records = result.records.filter(record => {
-        if (!/^\d{14}$/.test(record.PIN14 || '') || seen.has(record.PIN14)) return false;
-        if (['township_name', 'NBHD', 'BCLASS', 'TAXYR', 'current_procname', 'current_value_desc'].some(key => record[key] !== subject[key])) return false;
-        if (!positive(record.BLDGSQFT) || record.BLDGSQFT < low || record.BLDGSQFT > high || !positive(record.CURRENTVALUE_TOTAL)) return false;
-        seen.add(record.PIN14);
-        return true;
+      const seen = new Set([id]), records = [];
+      let result, examined = 0, pages = 0;
+      // Walk a value-independent, PIN-ordered sample; never retry for a desired outcome.
+      for (let page = 0; page < 3; page++) {
+        result = await query(where, 20, signal, page * 20);
+        pages++;
+        examined += result.records.length;
+        for (const record of result.records) {
+          if (!/^\d{14}$/.test(record.PIN14 || '') || seen.has(record.PIN14)) continue;
+          if (['township_name', 'NBHD', 'BCLASS', 'TAXYR', 'current_procname', 'current_value_desc'].some(key => record[key] !== subject[key])) continue;
+          if (!positive(record.BLDGSQFT) || record.BLDGSQFT < low || record.BLDGSQFT > high || !positive(record.CURRENTVALUE_TOTAL)) continue;
+          seen.add(record.PIN14);
+          records.push(record);
+        }
+        onProgress?.({pages, examined});
+        signal?.throwIfAborted();
+        if (!result.truncated) break;
+      }
+      records.sort((a, b) => {
+        const lowerFirst = Number(b.CURRENTVALUE_TOTAL < subject.CURRENTVALUE_TOTAL) - Number(a.CURRENTVALUE_TOTAL < subject.CURRENTVALUE_TOTAL);
+        return lowerFirst || Math.abs(a.BLDGSQFT - subject.BLDGSQFT) - Math.abs(b.BLDGSQFT - subject.BLDGSQFT)
+          || a.CURRENTVALUE_TOTAL - b.CURRENTVALUE_TOTAL || a.PIN14.localeCompare(b.PIN14);
       });
-      return {...result, records, subject, subjectRetrievedAt: subjectResult.retrievedAt, state: records.length ? 'candidates' : 'no-candidates', excludedCount: result.records.length - records.length, filters: {class: subject.BCLASS, neighborhood: subject.NBHD, township: subject.township_name, year: subject.TAXYR, stage: subject.current_procname, valueLabel: subject.current_value_desc, buildingSizeMin: low, buildingSizeMax: high}, limitation};
+      return {...result, records, subject, subjectRetrievedAt: subjectResult.retrievedAt, state: records.length ? 'candidates' : 'no-candidates', excludedCount: examined - records.length, search: {examined, pages, limit: 60, version: 'bounded-pool-1'}, filters: {class: subject.BCLASS, neighborhood: subject.NBHD, township: subject.township_name, year: subject.TAXYR, stage: subject.current_procname, valueLabel: subject.current_value_desc, buildingSizeMin: low, buildingSizeMax: high}, limitation};
     }
   };
 }

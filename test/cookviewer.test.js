@@ -36,7 +36,7 @@ test('candidate query re-fetches source subject and requires compatible class, n
  const r=await client.candidates(parcel.PIN14);
  const where=urls[1].searchParams.get('where');
  for(const clause of ["PIN14 <> '01011000250000'","township_name = 'Test Township'",'NBHD = 12',"BCLASS = '203'",'TAXYR = 2026',"current_procname = 'CCAOVALUE'","current_value_desc = '2026 Assessor Valuation'",'BLDGSQFT BETWEEN 999 AND 1497'])assert.ok(where.includes(clause),clause);
- assert.equal(urls[1].searchParams.get('resultRecordCount'),'5');assert.equal(r.records.length,1);assert.equal(r.subject.PIN14,parcel.PIN14);assert.match(r.limitation,/not.*comparables/i);
+ assert.equal(urls[1].searchParams.get('resultRecordCount'),'20');assert.equal(r.records.length,1);assert.equal(r.subject.PIN14,parcel.PIN14);assert.match(r.limitation,/not.*comparables/i);
 });
 test('missing fields never become zero or a broader candidate query',async()=>{
  for(const key of ['NBHD','TAXYR','BCLASS','BLDGSQFT','township_name','current_procname','current_value_desc']){

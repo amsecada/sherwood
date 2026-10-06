@@ -34,7 +34,7 @@ export function formatDelta(value) {
 
 export const disparityConfig = Object.freeze({version: 'live-median-2', minimumCount: 3, noticeable: 5, substantial: 15});
 
-export function summarizeCandidates(subject, records = []) {
+export function summarizeCandidates(subject, records = [], {searched = false, truncated = false} = {}) {
   const counts = {lower: 0, equal: 0, higher: 0}, values = [];
   for (const candidate of records) {
     const value = subject && candidateMetrics(subject, candidate).valueDelta;
@@ -51,12 +51,14 @@ export function summarizeCandidates(subject, records = []) {
   const messages = {'at-or-below': "This property's value is at or below the middle of the comparison group.", small: 'A small difference in the values.', noticeable: 'A noticeable difference worth a closer look.', substantial: 'A substantial difference stands out.'};
   const message = band ? messages[band] : 'The sample cannot support a median-based summary.';
   const comparison = band ? ` The property is ${number.format(Math.abs(percentage))}% ${percentage < 0 ? 'below' : 'above'} the comparison median of ${number.format(median)}, based on ${usable} usable records.` : '';
+  const scope = searched ? `This summary uses all ${records.length} examined matches, including higher values. ${truncated ? 'The source reports more records that were not examined; this is a limited sample. ' : ''}` : '';
+  const version = searched ? 'live-search-median-3' : disparityConfig.version;
   return {
     disparity: {median, percentage, band, message},
     state: usable ? 'available' : 'unavailable', shown: records.length, usable, omitted, ...counts,
     explanation: usable
-      ? `${message}${comparison} Of the ${usable} shown candidates with compatible County values, ${counts.lower} are lower, ${counts.equal} equal and ${counts.higher} higher than this property. ${omitted ? `${omitted} shown records have unusable comparison values. ` : ''}`
+      ? `${scope}${message}${comparison} Of the ${usable} ${searched ? 'examined matches' : 'shown candidates'} with compatible County values, ${counts.lower} are lower, ${counts.equal} equal and ${counts.higher} higher than this property. ${omitted ? `${omitted} shown records have unusable comparison values. ` : ''}`
       : 'There are no usable compatible candidate values to summarize. This is unavailable evidence, not a conclusion about the assessment.',
-    methodVersion: disparityConfig.version, templateVersion: disparityConfig.version
+    methodVersion: version, templateVersion: version
   };
 }

@@ -16,6 +16,11 @@ const fixture=async url=>{
  if(mode==='missing-subject'&&!where.includes('<>'))rows=rows.map(r=>({...r,latitude:null,longitude:null}));
  if(mode==='overlap')rows=rows.map(r=>({...r,latitude:42,longitude:-88}));
  if(mode==='reverse'&&where.includes('<>'))rows.reverse();
+ if(mode==='paged'&&where.includes('<>')) {
+  const offset=Number(new URL(url).searchParams.get('resultOffset')||0);
+  rows=offset===0?Array.from({length:20},(_,i)=>({...subject,PIN14:String(20000000000000+i),street_address:`${i+1} HIGHER ST`,CURRENTVALUE_TOTAL:110})):[{...subject,PIN14:'20000000000020',street_address:'20 LOWER ST',CURRENTVALUE_TOTAL:70},{...subject,PIN14:'20000000000021',street_address:'21 LOWER ST',CURRENTVALUE_TOTAL:90}];
+  return new Response(JSON.stringify({features:rows.map(attributes=>({attributes})),exceededTransferLimit:offset===0}));
+ }
  return new Response(JSON.stringify({features:rows.map(attributes=>({attributes}))}));
 };
 const server=staticServer({prefix:'/sherwood/'});
@@ -29,7 +34,7 @@ try{
  await context.route('**/api/**',route=>{unexpected.push(route.request().url());return route.abort();});
  await context.route('https://gis.cookcountyil.gov/**',async route=>{try{const r=await fixture(route.request().url());await route.fulfill({status:200,contentType:'application/json',body:await r.text()});}catch{await route.abort();}});
  const page=await context.newPage();page.setDefaultTimeout(5000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(base);await page.locator('#lookup-submit').click();
+ await page.goto(base);await mkdir('/tmp/sherwood-gallery-artifacts',{recursive:true});await page.screenshot({path:'/tmp/sherwood-gallery-artifacts/home.png',fullPage:true,animations:'disabled'});await page.locator('#lookup-submit').click();
  await page.locator('#analysis-content').waitFor({state:'visible'});
  assert.match(await page.locator('#analysis-content').innerText(),/1 are lower/);
  assert.equal(await page.locator('.map-choice').count(),0);assert.equal(await page.locator('#raw-source').getAttribute('open'),null);
@@ -71,12 +76,12 @@ try{
   assert.equal(await page.locator('tr.map-selected').count(),0);
   await page.locator('tr[data-pin="01011000450000"]').focus();assert.ok(await page.locator('.map-marker[data-pin="01011000450000"]').evaluate(e=>e.classList.contains('selected')));
   assert.equal(calls,before);
-  assert.ok(await page.locator('.map-controls').evaluate(e=>e.getBoundingClientRect().top >= document.querySelector('.map-viewport').getBoundingClientRect().bottom));
   assert.ok(await page.locator('.property-map').evaluate(e=>[...e.children].find(n=>n.textContent.startsWith('S = subject')).getBoundingClientRect().top >= e.querySelector('.map-viewport').getBoundingClientRect().bottom));
   assert.equal(await page.locator('.map-playback').count(),0);
+  assert.equal(await page.locator('.property-map input[type=checkbox]').count(),0);
+  await page.locator('.map-viewport').scrollIntoViewIfNeeded();
+  await page.locator('.map-tiles img').first().waitFor({state:'attached'});
   await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.radar-ring').evaluate(e=>getComputedStyle(e).animationName),'none');
-  await page.getByRole('checkbox',{name:'Show street background (OpenStreetMap)',exact:true}).uncheck();assert.equal(await page.locator('.map-tiles img').count(),0);
-  await page.getByRole('checkbox',{name:'Show street background (OpenStreetMap)',exact:true}).check();
   await mkdir('/tmp/sherwood-gallery-artifacts',{recursive:true});await page.screenshot({path:'/tmp/sherwood-gallery-artifacts/desktop.png',fullPage:true});
   await page.setViewportSize({width:390,height:844});await page.locator('.property-map').scrollIntoViewIfNeeded();await page.locator('tr[data-pin="01011000430000"] > td').first().click();
   assert.ok(await page.locator('tr[data-pin="01011000430000"]').evaluate(e=>e.classList.contains('map-selected')));
@@ -107,6 +112,27 @@ try{
   }
   await edge.close();mode='normal';
  }
+ // A lower-value shortlist must not change the full-pool summary or hide its context.
+ mode='paged';const ranked=await context.newPage();ranked.setDefaultTimeout(5000);await ranked.goto(base);
+ await ranked.locator('#lookup-submit').click();await ranked.locator('#analysis-content').waitFor({state:'visible'});
+ assert.match(await ranked.locator('.search-overview').innerText(),/22.*examined/s);
+ assert.match(await ranked.locator('.search-overview').innerText(),/2 lower/);
+ assert.match(await ranked.locator('#analysis-content').innerText(),/median of 110/);
+ assert.equal(await ranked.locator('.comparison-table tbody tr:visible').count(),6);
+ assert.match(await ranked.locator('.comparison-table tbody tr').nth(1).innerText(),/20 LOWER ST/);
+ const beforeToggle=calls;
+ await ranked.getByRole('button',{name:'Show all 22 matches',exact:true}).click();
+ assert.equal(await ranked.locator('.comparison-table tbody tr:visible').count(),23);
+ await ranked.getByRole('button',{name:'Details for 20 HIGHER ST',exact:true}).click();
+ await ranked.locator('.candidate-details[open]').waitFor();
+ await ranked.getByRole('button',{name:'Show shortlist',exact:true}).click();
+ assert.equal(await ranked.locator('.candidate-details[open]').count(),0);
+ assert.equal(await ranked.locator('.comparison-table tbody tr:visible').count(),6);
+ assert.equal(calls,beforeToggle,'Switching views never queries for a different outcome');
+ await ranked.setViewportSize({width:375,height:844});
+ assert.ok(await ranked.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await ranked.screenshot({path:'/tmp/sherwood-gallery-artifacts/search-mobile.png',fullPage:true});
+ await ranked.close();mode='normal';
  // Long-lived request controls must not be redrawn every tick after evidence expiry.
  const expiryPage=await context.newPage();expiryPage.setDefaultTimeout(5000);await expiryPage.clock.install();
  await expiryPage.goto(base);await expiryPage.locator('#lookup-submit').click();await expiryPage.locator('#analysis-content').waitFor({state:'visible'});

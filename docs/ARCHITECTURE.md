@@ -150,3 +150,17 @@ The user requested eliminating npm from site setup and hosting. public/ is now t
 ## Explicit details and mobile layout
 
 FEAT-022 supersedes hover/focus detail preview. Candidate row buttons control full-width native details disclosures outside the table scroller; one is visible at a time. Native toggle synchronizes aria-expanded and returns focus on close. Escape dispatches dismissal. Mobile hides secondary main-table columns, retaining those values in the responsive detail grid. Map hover remains only for linked selection, not opening details.
+
+## Forest presentation — DEC-028
+
+FEAT-010 uses a separate public/forest.css presentation layer over existing functional styles, plus a local decorative fern.svg. No product dependencies, remote fonts or build step. CSS handles short spring-like entrances, button presses, disclosure reveals and selection transitions; reduced-motion disables animations/transitions including existing map radar. Map tiles remain visibility-gated with failure fallback and attribution; checkbox and its state/listener removed. This supersedes historical street-toggle and redesign-deferred statements.
+
+## Bounded browser search — DEC-029 / FEAT-023
+
+public/cookviewer.js now fetches up to three sequential 20-record pages ordered by unique PIN14 with resultOffset (County layer advertises supportsPagination/supportsOrderBy). Same matching filters on every page; each result locally validated and deduplicated. Subject re-fetched, positive total required. Existing 15-second per-query timeout, two concurrent queries/page and 60 starts/minute remain; maximum four queries per candidates operation (subject plus three pages), plus original address lookup. Progress callback is generation-guarded; cancellation checked before requests and after response parsing. Failure rejects entire search rather than returning partial evidence.
+
+All accepted records are retained transiently, ordered lower-first then absolute size difference, total and PIN. live.js initially displays five; switching view hides/shows rows and remounts the map after disposing prior listeners/observers. Summary uses all accepted records with population/truncation wording; method live-search-median-3. The fictional simulation clones the full evidence including search counts/limit/version. No application backend or dependency added.
+
+## Dark glass presentation — DEC-030
+
+forest.css now supplies dark color-scheme and palette throughout the visitor UI. Semi-opaque gradient surfaces retain dark fallback backgrounds; backdrop-filter is guarded with @supports. CSS filter affects only map tile imagery, preserving controls/markers/attribution. Existing motion and reduced-motion rules retained. No runtime logic, asset dependency or hosting change.

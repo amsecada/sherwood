@@ -1,3 +1,5 @@
+> Current visual status: FEAT-010 is authorized and implemented under DEC-028; earlier blocked statements are historical.
+
 # Project Sherwood — Backlog
 
 Updated 2026-10-06. Aligned to the four-step [PRD](PRD.md), DEC-012–021, and [architecture](ARCHITECTURE.md). Earlier acceptance criteria requiring scores, savings, AI, paid data, billing, or structured outcomes are superseded by the scope below. IDs are permanent.
@@ -20,7 +22,7 @@ The user requests a **live-feed gallery demonstration**, combining real Cook Cou
 |---|---|---|---|
 | 1 | FEAT-008 — Unified live-feed demonstration | P1 (explicit user priority) | Implemented/verified locally; public release blocked on source-use and hosted checks |
 | 2 | FEAT-009 — Linked property map and radar effects | P2 (proposed sequencing after merge) | Implemented/verified locally; County coordinates and OSM street-map design approved |
-| 3 | FEAT-010 — Visual redesign | P2 (proposed) | **Blocked — separate design discussion with user required** |
+| 3 | FEAT-010 — Visual redesign | P2 | Implemented locally under DEC-028; verification in worklog |
 
 ### Pre-implementation functionality review (2026-10-06)
 
@@ -90,14 +92,11 @@ Done: requested map placement, linked highlighting and agreed radar effect work 
 
 ## FEAT-010 — Improve the site's visual design
 
-- Type/status/priority: design and implementation feature; **BLOCKED, P2** (proposed priority).
-- Blocker: the user explicitly requires a **separate design discussion before styling implementation**. Do not choose a theme, brand, layout overhaul, typography or animation direction on their behalf.
-- Value: make the merged gallery demo attractive, coherent and readable while preserving the honest distinction between live evidence and fictional handoff.
-- Requirements: FR-020; FR-007; NFR-006; DEC-021.
-- Dependencies: user design discussion and approval; FEAT-008 journey and FEAT-009 placement/contracts as design inputs. FEAT-008/009 may progress using current styles and necessary functional layout/accessibility changes.
-- Unblock deliverable: record intended audience/tone, reference examples, visual hierarchy, colors/typography, desktop/mobile layouts, table/details/map treatment, loading/empty/error/confirmation states, accessibility and motion expectations. Present a coherent proposed direction and get the user's explicit approval; record it in a linked design artifact before changing this item's status.
-- Acceptance after unblock: implement the approved direction consistently across lookup, results/analysis, map (when available), fictional handoff and operator screens within the approved design scope. Keep source labels, limitations, simulation notices and keyboard focus readable; avoid cosmetic styling that implies assessment correctness or guaranteed outcomes. Define measurable visual checks from the approved design, not invented branding criteria now.
-- Verification/Done: approved reference/design linked; responsive visual and keyboard review against it; contrast/reduced-motion checks and functional regression checks completed; docs/worklog updated. This item cannot be marked ready or done merely because a dev agent improved CSS. No visual redesign is authorized by this backlog preparation.
+- Type/status/priority: design and implementation feature; implemented locally, P2. Historical blocked references below are superseded by DEC-028.
+- Authorization: user requested a green Sherwood forest redesign, referenced Kinetics, and explicitly delegated full creative control. [DEC-028](PRD.md#dec-028--forest-visual-redesign-and-always-on-streets) records the direction and supersedes DEC-021's gate.
+- Requirements: FR-020, FR-007/019, NFR-006. Existing FEAT-008/009 journey and map/table behavior retained; retired operator screens excluded.
+- Delivered: warm paper and forest palette, fern illustration, editorial home screen, distinct search/value/analysis/handoff panels, table hover/selection, spring-like entrances/buttons/detail reveal, visible focus and reduced-motion override. Always-on visible street tiles replace FEAT-017 checkbox.
+- Acceptance: all existing four-step behavior preserved, no mobile page/detail overflow at 320/375/390/768, keyboard details and map selection retained, motion disabled by preference, readable source/simulation notices. Verification and limitations recorded in worklog.
 
 ## Gallery feedback — 2026-10-06
 
@@ -381,3 +380,14 @@ Audit this revision against active requirements and DEC-012–021, including gal
 
 - User authorized pushing approved changes, then outgoing-link CI and Pages setup. Link checker and separate CI job implemented; Pages deployment requires both static and link checks. Tests cover discovery, redirects/status, retries and terminal failures.
 - Four current visitor link destinations returned HTTP 200 locally. Repository Pages settings still require authenticated browser access; plugin lacks Pages-settings capability. No publication claimed.
+
+## FEAT-023 — Bounded search and lower-value shortlist
+
+- User-authorized, implemented and verified locally for user review. Requirements FR-023, FR-007/018/019, NFR-004/006; DEC-029. Depends on existing static gallery; production method/source-rights gates remain separate.
+- Acceptance: async sequential pagination up to 60 records; stable unchanged matching constraints, cancellation and timeout; no outcome-dependent stopping. Validate/deduplicate every response. Lower-valued records first, closest building size before cheapest total within each group.
+- Show five initially, accessible Show all / Show shortlist controls without new source requests, linked map/table and details maintained. Explicit full-pool counts and truncation; no-match and failure states. Summary and simulation retain full-pool context independent of shortlist.
+- Verification: unit fixtures for later-page discovery, cap, ranking, validation, cancellation, later-page failure and summary; browser checks for shortlist/all toggle, full-pool median and mobile overflow, plus existing journey regression. Exact results recorded in worklog.
+
+### FEAT-010 refinement — DEC-030
+
+User-authorized dark forest/slate/glass presentation update under FR-020 and NFR-006. Changes in forest.css: layered dark canvas, translucent cards with optional backdrop blur, mint primary actions, light text and accessible green/coral deltas, dark map imagery and fallback grid. Same lookup/search/map/details/handoff behavior. Acceptance: desktop/mobile visual review, readable text/deltas/focus, existing browser regression and reduced-motion checks; exact verification in worklog.

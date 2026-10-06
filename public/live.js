@@ -167,10 +167,12 @@ async function fetchCandidates(id) {
   $('raw-source').hidden = true; $('raw-source').open = false; $('field-rows').replaceChildren();
   propertyMap?.destroy(); propertyMap = undefined;
   $('candidate-content').replaceChildren();
-  status('Re-fetching the subject and querying up to five exploratory candidates…');
+  status('Refreshing the property and searching matching records…');
   try {
-    const result = await reader.candidates(selectedPin, {signal: controller?.signal});
-    result.analysis = summarizeCandidates(result.subject, result.records || []);
+    const result = await reader.candidates(selectedPin, {signal: controller?.signal, onProgress: progress => {
+      if (id === generation) status(`Searching matching records… ${progress.examined} examined across ${progress.pages} batch${progress.pages === 1 ? '' : 'es'} (up to 60 records).`);
+    }});
+    result.analysis = summarizeCandidates(result.subject, result.records || [], {searched: true, truncated: result.truncated});
     result.expiresAt = Date.now() + 900000;
     result.provider = {id: 'demo-professional', name: 'Demo Neighborhood Assessment Studio'};
     if (id !== generation) return;
@@ -183,8 +185,16 @@ async function fetchCandidates(id) {
       selectedPin = undefined;
       $('candidate-note').textContent = 'The refreshed subject did not resolve uniquely. Run a new lookup; no candidate conclusion can be drawn.';
     } else {
-      $('candidate-note').textContent = `${result.records.length} exploratory candidate${result.records.length === 1 ? '' : 's'} shown. ${result.truncated ? 'The source reports more records beyond this limited page. ' : ''}${result.excludedCount ? `${result.excludedCount} returned records failed the local field checks. ` : ''}${result.limitation}`;
+      const analysis = result.analysis;
+      $('candidate-note').textContent = `${result.records.length} matches passed the field checks. ${result.excludedCount ? `${result.excludedCount} duplicate or unsuitable returned records excluded. ` : ''}${result.limitation}`;
+      const overview = node('div', undefined, 'search-overview');
+      overview.append(node('p', 'A closer look for lower values', 'eyebrow'));
+      overview.append(node('h3', analysis.lower ? `${analysis.lower} lower-valued match${analysis.lower === 1 ? '' : 'es'} to explore.` : 'No lower-valued matches found in this search.'));
+      overview.append(node('p', `${result.search.examined} records examined in ${result.search.pages} batch${result.search.pages === 1 ? '' : 'es'} · ${analysis.lower} lower · ${analysis.equal} equal · ${analysis.higher} higher.`, 'search-counts'));
+      overview.append(node('p', `Lower values come first, then closest building size, then lowest County value. Same township, neighborhood, class, year and value stage; size within ±20%. Age and condition are not matching rules, so review the differences. ${result.truncated ? 'Search limit reached: more source records remain unexamined. These are not necessarily the lowest values available.' : 'The source returned no further matches for these filters.'}`, 'help'));
+      $('candidate-content').append(overview);
       const wrap = node('div', undefined, 'table-wrap'), table = node('table');
+      const viewNote = node('p', '', 'help'); overview.append(viewNote);
       table.append(node('caption', `Candidate minus subject: ${result.subject.street_address || result.subject.PIN14}. Green = lower County value; red = higher; neither indicates appeal merit.`));
       const head = node('thead'), tr = node('tr');
       for (const title of ['Property / details', 'County value / label', 'County value Δ', 'Building size / Δ', 'Age / Δ', 'Tax year / stage', 'Source edit date']) {
@@ -236,7 +246,23 @@ async function fetchCandidates(id) {
       const mapContainer = node('div'); $('candidate-content').append(mapContainer);
       table.className = 'comparison-table';
       table.append(rows); wrap.append(table); $('candidate-content').append(wrap, detailArea);
-      propertyMap = mountPropertyMap(mapContainer, {...result, rowsByPin});
+      let showAll = false;
+      const viewButton = node('button', `Show all ${result.records.length} matches`, 'secondary');
+      viewButton.type = 'button'; viewButton.hidden = result.records.length <= 5;
+      table.id = 'comparison-table'; viewButton.setAttribute('aria-controls', table.id);
+      const updateView = () => {
+        const visibleRecords = showAll ? result.records : result.records.slice(0, 5);
+        const visiblePins = new Set([result.subject.PIN14, ...visibleRecords.map(p => p.PIN14)]);
+        for (const [pin, row] of rowsByPin) row.hidden = !visiblePins.has(pin);
+        for (const details of detailArea.querySelectorAll('details')) {details.open = false; details.hidden = true;}
+        viewNote.textContent = `Showing ${visibleRecords.length} of ${result.records.length} matches. The summary below uses all ${result.records.length}, regardless of this view.`;
+        viewButton.textContent = showAll ? 'Show shortlist' : `Show all ${result.records.length} matches`;
+        viewButton.setAttribute('aria-expanded', String(showAll));
+        propertyMap?.destroy(); mapContainer.replaceChildren();
+        propertyMap = mountPropertyMap(mapContainer, {...result, records: visibleRecords, rowsByPin: new Map([...rowsByPin].filter(([pin]) => visiblePins.has(pin)))});
+      };
+      viewButton.onclick = () => {showAll = !showAll; updateView();};
+      overview.append(viewButton); updateView();
       const filters = result.filters;
       $('candidate-content').append(node('p', `Exploratory filter: township ${filters.township}; neighborhood ${filters.neighborhood}; class ${filters.class}; year ${filters.year}; label ${filters.valueLabel}; stage ${filters.stage}; building size ${filters.buildingSizeMin}–${filters.buildingSizeMax} sq ft. The size range is a test setting, not an approved matching rule.`, 'help'));
     }

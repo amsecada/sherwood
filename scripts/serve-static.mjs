@@ -10,7 +10,7 @@ export function staticServer({root=resolve('public'),prefix='/'}={}) {
   if (!/^[\w.-]+$/.test(name)) {res.writeHead(404);res.end();return;}
   try {
    const data=await readFile(resolve(root,name));
-   const type={'.html':'text/html','.js':'text/javascript','.css':'text/css'}[extname(name)]||'text/plain';
+   const type={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml'}[extname(name)]||'text/plain';
    res.writeHead(200,{'Content-Type':`${type}; charset=utf-8`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(req.method==='HEAD'?undefined:data);
   } catch {res.writeHead(404);res.end();}
  });
