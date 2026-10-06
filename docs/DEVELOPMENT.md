@@ -15,7 +15,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-The browser checks serve public/ at /sherwood/, use authored County responses, intercept map tiles, and reject application API calls. They cover lookup, missing/error states, consent, Withdraw/Delete, reload clearing, linked map selection and narrow layouts. A live-source check is separate from deterministic CI. GitHub Actions installs its own test dependencies and uploads the same checked public/ folder only on manual dispatch from main.
+The browser checks serve public/ at /sherwood/, use authored County responses, intercept map tiles, and reject application API calls. They cover lookup, missing/error states, consent, Withdraw/Delete, reload clearing, linked map selection and narrow layouts. A live-source check is separate from deterministic CI. GitHub Actions installs its own test dependencies and uploads the same checked public/ folder on pushes to main or manual dispatch from main, after both CI jobs pass.
 
 `npm start` remains an optional Node-based static preview convenience; Python or any other static file server works equally well. Old src/ server and synthetic fixture tests are historical implementation coverage and are not deployed. render.yaml is historical hosting preparation, not the current Pages setup.
 

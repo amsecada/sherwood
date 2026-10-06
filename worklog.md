@@ -252,3 +252,9 @@ Concise delivery ledger, newest entries first. Append-only except factual correc
 - Pushed approved no-build/mobile/details changes first: 6185aae to origin/main. Added dependency-free link checker and separate Outgoing links CI job afterward, as requested. Deploy depends on static checks and links; remains manual.
 - PASS: three checker unit scenarios (discovery, success/404, retry/exhaustion); four actual outgoing destinations returned HTTP 200: CookViewer parcel layer, County terms, OSM copyright and OSM fix-map. No tile crawling. Full unit/static checks performed separately.
 - Pages settings browser returns signed-out 404; requested user sign-in. SSH push is available, but does not grant Pages REST/UI settings access. No site publication or remote Pages setting change claimed.
+
+## 2026-10-06 — Pages Action runtime upgrade and automatic publication
+
+- Diagnosed Node 20 warning as transitive upload-artifact dependency of upload-pages-artifact v4. Updated official upload-pages-artifact to SHA-pinned v5 (fc324d3547104276b827a68afc52ff2a11cc49c9); its pinned upload-artifact v7 uses Node 24. Project test Node version is separate and remains 22.
+- Enabled artifact upload/deployment on main pushes as accepted by user, retaining manual dispatch and both check/link dependencies. PRs cannot deploy; deployment permissions remain scoped to deploy job. README/development instructions updated.
+- Verified official Action metadata and parsed workflow conditions/dependencies locally. Remote execution to be confirmed after push; no application behavior changed.

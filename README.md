@@ -33,6 +33,6 @@ Then open [localhost:3100](http://127.0.0.1:3100/). Serve the files over HTTP or
 
 ## GitHub Pages
 
-The included workflow tests the exact files in `public/` and checks outgoing links before publication. Select **GitHub Actions** as the source in **Settings → Pages**, then run **Static checks and Pages** from the Actions tab when ready to publish. Pushes and pull requests run checks without publishing automatically. No `gh-pages` branch is needed.
+The included workflow tests the exact files in `public/` and checks outgoing links before publication. Select **GitHub Actions** as the source in **Settings → Pages**, then pushes to `main` publish automatically after both static tests and outgoing-link checks pass. Pull requests run checks without publishing. You can also run **Static checks and Pages** manually from the Actions tab. No `gh-pages` branch is needed.
 
 Node/npm are used only by the optional development tests and automated checks, not by the website itself. See the [development guide](docs/DEVELOPMENT.md) for test commands and project details.
